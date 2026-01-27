@@ -209,7 +209,7 @@
         .pos-ora { left: -15%; transform: scale(1.35); z-index: 15; }
         .pos-manmu { right: -15%; transform: scale(0.9); z-index: 15; }
         /* 第四章專用站位 */
-        .pos-moli { right: -15%; transform: scale(0.9); z-index: 15; }
+        .pos-moli { right: -15%; transform: scale(0.95); z-index: 15; }
         .pos-lanlan { left: -15%; transform: scale(0.9); z-index: 15; }
         /* 第五章專用站位 */
         .pos-melas { right: -15%; transform: scale(0.95); z-index: 15; }
@@ -243,7 +243,7 @@
         .pos-ora.active { transform: scale(1.45); filter: brightness(1.1); }
         .pos-manmu.active { transform: scale(1.0); filter: brightness(1.1); }
         /* 第四章站位 Active */
-        .pos-moli.active { transform: scale(1.0); filter: brightness(1.1); }
+        .pos-moli.active { transform: scale(1.05); filter: brightness(1.1); }
         .pos-lanlan.active { transform: scale(1.0); filter: brightness(1.1); }
         /* 第五章站位 Active */
         .pos-melas.active { transform: scale(1.05); filter: brightness(1.1); }
@@ -2377,7 +2377,7 @@
             
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(600, t);
-            gain.gain.setValueAtTime(0.2 * globalSfxVolume, t);
+            gain.gain.setValueAtTime(0.5 * globalSfxVolume, t);
             gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
             osc.start(t);
             osc.stop(t + 0.05);
@@ -3243,6 +3243,7 @@
                 }, 800);
             } else if(currentLvl === 2) {
                 document.getElementById('friction-select').disabled = false;
+                document.getElementById('friction-select').value = "High"; // 重置為 High，強制玩家修改
             } else if(currentLvl === 3) {
                 document.getElementById('friction-select').disabled = true; 
                 document.getElementById('drop-zone').style.display = 'flex';
@@ -4008,11 +4009,11 @@
 
         function failGame(msg) {
             clearInterval(gameInterval);
-            if(confirm(msg + "\n\n要重試本關卡嗎？")) {
+            showModal("GAME OVER", msg + "\n\n點擊確認重試。", () => {
                 document.getElementById('conveyor').innerHTML = '';
                 bombsDefused = 0;
                 startMiniGame();
-            }
+            });
         }
 
         function startStage6Ending() {
