@@ -1,0 +1,144 @@
+第一步：建立資料夾結構 (整理書櫃)
+首先，請在你的電腦桌面上建立一個新資料夾（例如命名為 Wonderland_Game），然後在裡面建立以下結構。這樣未來的第七章、第八章就只需要丟進對應的資料夾即可。
+
+Plaintext
+Wonderland_Game/
+│
+├── index.html          (原本的 6.html，但我們會把它變得很乾淨)
+│
+├── css/                (放樣式表，負責「長什麼樣子」)
+│   └── style.css
+│
+├── js/                 (放程式邏輯，負責「怎麼運作」)
+│   ├── engine.js       (核心引擎：打字機、音樂播放、存檔功能)
+│   │
+│   ├── data/           (放劇本文字，負責「說什麼話」)
+│   │   ├── prologue.js
+│   │   ├── chapter1.js
+│   │   ├── chapter2.js
+│   │   └── ... (以後新增 chapter7.js 就在這)
+│   │
+│   └── logic/          (放小遊戲邏輯，負責「怎麼玩」)
+│       ├── stage1.js   (第一章排序遊戲)
+│       ├── stage2.js   (第二章邏輯閘)
+│       └── ... (以後新增 stage7.js 就在這)
+│
+└── assets/             (把你的圖片和音樂連結整理在這邊，選用)
+第二步：開始拆分 (剪下貼上)
+請依照下列順序，把 6.html 裡面的東西搬家：
+
+1. 搬移樣式 (CSS)
+動作： 把 6.html 裡 <style> 到 </style> 中間的所有內容剪下來。
+
+貼到： css/style.css 檔案中。
+
+修改 index.html： 在 <head> 裡原本放 style 的地方，改寫成一句話：
+
+HTML
+<link rel="stylesheet" href="css/style.css">
+2. 搬移劇本 (Data) - 這是您最常需要改的地方
+為了不讓程式碼干擾寫作，我們把「對話」獨立出來。
+
+動作： 在 js/data/ 裡建立 chapter1.js。
+
+內容範例： 把 const levels = { ... } 這種純文字設定搬過去。為了讓主程式讀得到，我們需要把它掛在一個「全域物件」上（這對初學者最簡單）。
+
+js/data/chapter1.js 的內容範例：
+
+JavaScript
+// 建立一個存放資料的地方，如果已經有了就沿用，沒有就建立新的
+window.GameData = window.GameData || {};
+
+// 把第一章的資料放進去
+window.GameData.Stage1 = {
+    title: "1-1: 大門",
+    intro: [
+        { n: "克里昂", t: "這裡...？", chars: [...] },
+        // ... 您的劇本內容
+    ],
+    // ... 其他設定
+};
+3. 搬移邏輯 (Logic)
+這是最容易出錯的地方，我們用「封裝」的方式來保護每一章。
+
+動作： 在 js/logic/ 裡建立 stage1.js。
+
+內容範例： 把 initStage1(), runSequence() 等只跟第一章有關的函式剪下來，包成一個物件。
+
+js/logic/stage1.js 的內容範例：
+
+JavaScript
+// 建立一個存放邏輯的地方
+window.StageLogic = window.StageLogic || {};
+
+window.StageLogic.Stage1 = {
+    init: function() {
+        // 這裡放原本 initStage1 的程式碼
+        // 注意：原本的變數如果要跨函式使用，建議用 this.變數名
+        console.log("第一章啟動");
+        this.setupUI();
+    },
+
+    setupUI: function() {
+        // 設定介面的程式碼
+    },
+
+    runGame: function() {
+        // 執行小遊戲的程式碼
+    }
+};
+4. 保留核心 (Engine)
+動作： 把剩下的通用功能（如 nextScript, startTyping, playClickSound, saveProgress）剪下來。
+
+貼到： js/engine.js。
+
+第三步：組裝 (修改 Index.html)
+最後，您的 index.html 會變得很乾淨，只剩下結構和「目錄」。以後要加新章節，只需要在這裡加一行引用。
+
+新的 index.html 底部樣子：
+
+HTML
+<body>
+    <div id="game-stage"> ... </div>
+
+    <script src="js/engine.js"></script>
+
+    <script src="js/data/prologue.js"></script>
+    <script src="js/data/chapter1.js"></script>
+    <script src="js/data/chapter2.js"></script>
+    <script src="js/logic/stage1.js"></script>
+    <script src="js/logic/stage2.js"></script>
+    <script>
+        // 這裡只需要很少的程式碼來啟動
+        window.onload = function() {
+            // 初始化選單等
+            console.log("系統載入完成");
+        };
+    </script>
+</body>
+以後如何添加第七章？
+當您完成上述拆分後，未來要添加「第七章：最終審判」，流程就會變得非常簡單且安全：
+
+寫劇本： 複製 js/data/chapter1.js，改名為 chapter7.js，把裡面的對話改成第七章的內容。
+
+寫遊戲： 複製 js/logic/stage1.js (或最接近玩法的章節)，改名為 stage7.js，修改裡面的規則。
+
+註冊： 打開 index.html，在底部加上兩行：
+
+HTML
+<script src="js/data/chapter7.js"></script>
+<script src="js/logic/stage7.js"></script>
+完成！
+
+
+6.html: 負責結構 (UI 容器)。
+
+style.css: 負責美觀 (樣式)。
+
+data.js: 負責內容 (劇本文字、關卡參數)。[改劇情動這裡]
+
+stages.js: 負責玩法 (小遊戲、拖曳、邏輯判斷)。[改遊戲規則動這裡]
+
+engine.js: 負責運作 (存檔、音樂、選單)。[改系統功能動這裡]
+
+這樣以後如果您想「修改第七章的判定範圍」，您就不用在幾千行的代碼裡大海撈針，直接打開 stages.js 捲到最下面就可以了！
